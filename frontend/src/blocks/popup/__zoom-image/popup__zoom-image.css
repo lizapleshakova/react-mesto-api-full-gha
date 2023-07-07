@@ -1,0 +1,9 @@
+.popup__zoom-image {
+  display: block;
+  max-height: 75vh;
+  max-width: 75vw;
+  object-position: center;
+  margin: 0;
+  padding: 0;
+
+}
