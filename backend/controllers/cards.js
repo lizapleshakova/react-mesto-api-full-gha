@@ -1,54 +1,56 @@
 const Card = require('../models/card');
 const {
   SUCCESS,
-  ERROR_BAD_REQUEST,
-  ERROR_NOT_FOUND,
-  ERROR_INTERNAL_SERVER,
 } = require('../utils/errorsStatus');
 
-const getCards = (req, res) => {
+const NotFoundError = require('../errors/notFoundError');
+const BadRequestError = require('../errors/badRequestError');
+const ForbiddenError = require('../errors/fobiddenError');
+
+const getCards = (req, res, next) => {
   Card
     .find({})
-    .then((card) => res.send({ data: card }))
-    .catch(() => res.status(ERROR_INTERNAL_SERVER).send({ message: 'Ошибка по умолчанию.' }));
+    .then((card) => res.send(card))
+    .catch(next);
 };
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
   const ownerId = req.user._id;
   Card
     .create({ name, link, owner: ownerId })
-    .then((card) => res.status(SUCCESS).send({ data: card }))
+    .then((card) => res.status(SUCCESS).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(ERROR_BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании карточки.' });
-        return;
+        return next(new BadRequestError('Переданы некорректные данные'));
       }
-      res.status(ERROR_INTERNAL_SERVER).send({ message: 'Ошибка по умолчанию.' });
+      return next(err);
     });
 };
 
-const deleteCard = (req, res) => {
-  const { cardId } = req.params;
+const deleteCard = (req, res, next) => {
   Card
-    .findByIdAndRemove(cardId)
+    .findById(req.params.cardId)
     .then((card) => {
       if (!card) {
-        res.status(ERROR_NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден.' });
-        return;
+        throw new NotFoundError('Карточка не найдена.');
       }
-      res.send({ data: card });
+      if (card.owner.toString() !== req.user._id) {
+        throw new ForbiddenError('Нет прав на удаление');
+      }
+
+      return Card
+        .deleteOne(card).then(() => res.send(card));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_BAD_REQUEST).send({ message: ' Переданы некорректные данные при создании карточки.' });
-        return;
+        return next(new BadRequestError('Переданы некорректные данные'));
       }
-      res.status(ERROR_INTERNAL_SERVER).send({ message: 'Ошибка по умолчанию.' });
+      return next(err);
     });
 };
 
-const putLike = (req, res) => {
+const putLike = (req, res, next) => {
   Card
     .findByIdAndUpdate(
       req.params.cardId,
@@ -57,21 +59,19 @@ const putLike = (req, res) => {
     )
     .then((card) => {
       if (!card) {
-        res.status(ERROR_NOT_FOUND).send({ message: 'Передан несуществующий _id карточки.' });
-        return;
+        throw new NotFoundError('Карточка не найдена.');
       }
       res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_BAD_REQUEST).send({ message: 'Переданы некорректные данные для постановки/cнятия лайка.' });
-        return;
+        return next(new BadRequestError('Переданы некорректные данные'));
       }
-      res.status(ERROR_INTERNAL_SERVER).send({ message: 'Ошибка по умолчанию.' });
+      return next(err);
     });
 };
 
-const deleteLike = (req, res) => {
+const deleteLike = (req, res, next) => {
   Card
     .findByIdAndUpdate(
       req.params.cardId,
@@ -80,17 +80,15 @@ const deleteLike = (req, res) => {
     )
     .then((card) => {
       if (!card) {
-        res.status(ERROR_NOT_FOUND).send({ message: 'Передан несуществующий _id карточки.' });
-        return;
+        throw new NotFoundError('Карточка не найдена.');
       }
-      res.send({ data: card });
+      res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_BAD_REQUEST).send({ message: 'Переданы некорректные данные для постановки/снятия лайка.' });
-        return;
+        return next(new BadRequestError('Переданы некорректные данные'));
       }
-      res.status(ERROR_INTERNAL_SERVER).send({ message: 'Ошибка по умолчанию.' });
+      return next(err);
     });
 };
 

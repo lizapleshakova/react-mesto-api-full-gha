@@ -35,6 +35,8 @@ function App() {
 
   const navigate = useNavigate();
 
+
+
   useEffect(() => {
     if (loggedIn) {
       api
@@ -108,9 +110,23 @@ function App() {
     }
   }, [isOpen]);
 
-  // Лайки
+  // // Лайки card
+  // function handleLike(card) {
+  //   const isLiked = card.likes.some((user) => user._id === currentUser._id);
+  //   api
+  //     .toggleLike(card._id, !isLiked)
+  //     .then((newCard) =>
+  //       setCards((state) =>
+  //         state.map((item) => (item._id === card._id ? newCard : item))
+  //       )
+  //     )
+  //     .catch((err) => console.log(`Ошибка получения данных: ${err}`));
+  // }
+
+
+// Лайки data
   function handleLike(data) {
-    const isLiked = data.likes.some((user) => user._id === currentUser._id);
+    const isLiked = data.likes.some((item) => item === currentUser._id);
     api
       .toggleLike(data._id, !isLiked)
       .then((newCard) =>
@@ -121,15 +137,26 @@ function App() {
       .catch((err) => console.log(`Ошибка получения данных: ${err}`));
   }
 
-  // удалить карточку
-  function handleDeleteClick(data) {
-    api
-      .removeCard(data._id)
-      .then(() =>
-        setCards((state) => state.filter((item) => item._id !== data._id))
-      )
-      .catch((err) => console.log(`Ошибка получения данных: ${err}`));
-  }
+
+  // удалить карточку card
+  // function handleDeleteClick(card) {
+  //   api
+  //     .removeCard(card._id)
+  //     .then(() =>
+  //       setCards((state) => state.filter((item) => item._id !== card._id))
+  //     )
+  //     .catch((err) => console.log(`Ошибка получения данных: ${err}`));
+  // }
+
+    // удалить карточку data
+    function handleDeleteClick(data) {
+      api
+        .removeCard(data._id)
+        .then(() =>
+          setCards((state) => state.filter((item) => item._id !== data._id))
+        )
+        .catch((err) => console.log(`Ошибка получения данных: ${err}`));
+    }
 
   function handleUpdateUser(newUserData) {
     api
@@ -172,7 +199,7 @@ function App() {
         .getContent(token)
         .then((res) => {
           if (res) {
-            const email = res.data.email;
+            const email = res.email;
             setEmail(email);
             setLoggedIn(true);
             navigate("/", { replace: true });
