@@ -4,6 +4,7 @@ const { errors } = require('celebrate');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const routes = require('./routes/index');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 // const { createUser, login } = require('./controllers/users');
 // const auth = require('./middlewares/auth');
@@ -27,7 +28,18 @@ app.use(bodyParser.json());
 //   next();
 // });
 app.use(cors());
+
+app.use(requestLogger);
+
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
+
 app.use(routes);
+
+app.use(errorLogger);
 
 // app.post('/signup', createUser);
 // app.post('/signin', login);
