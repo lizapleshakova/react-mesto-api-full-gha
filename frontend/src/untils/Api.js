@@ -79,9 +79,9 @@
   }
 
   // Поставить лайк
-  toggleLike(cardId, isLiked) {
+  toggleLike(id, isLiked) {
     const token = localStorage.getItem('token');
-    return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
+    return fetch(`${this._baseUrl}/cards/${id}/likes`, {
       method: `${isLiked ? 'PUT' : 'DELETE'}`,
       headers: {
         authorization: `Bearer ${token}`,

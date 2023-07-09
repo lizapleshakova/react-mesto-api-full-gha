@@ -110,23 +110,10 @@ function App() {
     }
   }, [isOpen]);
 
-  // // Лайки card
-  // function handleLike(card) {
-  //   const isLiked = card.likes.some((user) => user._id === currentUser._id);
-  //   api
-  //     .toggleLike(card._id, !isLiked)
-  //     .then((newCard) =>
-  //       setCards((state) =>
-  //         state.map((item) => (item._id === card._id ? newCard : item))
-  //       )
-  //     )
-  //     .catch((err) => console.log(`Ошибка получения данных: ${err}`));
-  // }
-
 
 // Лайки data
   function handleLike(data) {
-    const isLiked = data.likes.some((item) => item === currentUser._id);
+    const isLiked = data.likes.some((i) => i === currentUser._id);
     api
       .toggleLike(data._id, !isLiked)
       .then((newCard) =>
@@ -136,17 +123,6 @@ function App() {
       )
       .catch((err) => console.log(`Ошибка получения данных: ${err}`));
   }
-
-
-  // удалить карточку card
-  // function handleDeleteClick(card) {
-  //   api
-  //     .removeCard(card._id)
-  //     .then(() =>
-  //       setCards((state) => state.filter((item) => item._id !== card._id))
-  //     )
-  //     .catch((err) => console.log(`Ошибка получения данных: ${err}`));
-  // }
 
     // удалить карточку data
     function handleDeleteClick(data) {
