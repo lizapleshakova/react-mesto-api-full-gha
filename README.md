@@ -9,7 +9,7 @@
 
 ## Ссылки на проект
 
-IP-адрес 158.160.101.240
+IP 158.160.101.240
 
 Frontend https://api.pleshakova.nomoredomains.work
 
